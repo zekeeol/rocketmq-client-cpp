@@ -183,11 +183,7 @@ ELSE ()
             # -rdynamic
             )
 
-    if (CMAKE_BUILD_BITS EQUAL 32)
-        list(APPEND CXX_FLAGS "-m32")
-    else () #not-condition
-        list(APPEND CXX_FLAGS "-m64")
-    endif ()
+    option(BUILD_FOR_ARM "Build for arm64 platform" OFF)
 
     string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
     string(REPLACE ";" " " CMAKE_C_FLAGS "${C_FLAGS}")

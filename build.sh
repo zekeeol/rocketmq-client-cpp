@@ -29,10 +29,10 @@ declare fname_openssl="openssl*.tar.gz"
 declare fname_libevent="libevent*.zip"
 declare fname_jsoncpp="jsoncpp*.zip"
 declare fname_boost="boost*.tar.gz"
-declare fname_openssl_down="openssl-1.1.1d.tar.gz"
+declare fname_openssl_down="openssl-3.3.0.tar.gz"
 declare fname_libevent_down="release-2.1.11-stable.zip"
 declare fname_jsoncpp_down="0.10.7.zip"
-declare fname_boost_down="1.78.0/boost_1_78_0.tar.gz"
+declare fname_boost_down="1.84.0/boost_1_84_0.tar.gz"
 
 PrintParams() {
   echo "=========================================one key build help============================================"
@@ -212,7 +212,7 @@ BuildOpenSSL() {
   if [ -e ${fname_openssl} ]; then
     echo "${fname_openssl} exists"
   else
-    wget https://www.openssl.org/source/old/1.1.1/${fname_openssl_down} -O ${fname_openssl_down} --no-check-certificate
+    wget https://www.openssl.org/source/old/3.3/${fname_openssl_down} -O ${fname_openssl_down} --no-check-certificate
   fi
   tar -zxvf ${fname_openssl} &> unzipopenssl.txt
   if [ $? -ne 0 ]; then
@@ -342,7 +342,8 @@ BuildJsonCPP() {
   echo "build jsoncpp success."
   if [ ! -f ${install_lib_dir}/lib/libjsoncpp.a ]; then
     echo " ./bin/lib directory is not libjsoncpp.a"
-    cp ${install_lib_dir}/lib/x86_64-linux-gnu/libjsoncpp.a ${install_lib_dir}/lib/
+    cp ${install_lib_dir}/lib/aarch64-linux-gnu/libjsoncpp.a ${install_lib_dir}/lib/
+    # cp ${install_lib_dir}/lib/x86_64-linux-gnu/libjsoncpp.a ${install_lib_dir}/lib/
   fi
 }
 
@@ -372,9 +373,9 @@ BuildBoost() {
   pwd
   if [ $verbose -eq 0 ]; then
     echo "build boost without detail log."
-    ./b2 -j$cpu_num cflags=-fPIC cxxflags=-fPIC --with-atomic --with-thread --with-system --with-chrono --with-date_time --with-log --with-regex --with-serialization --with-filesystem --with-locale --with-iostreams threading=multi link=static release install --prefix=${install_lib_dir} &> boostbuild.txt
+    ./b2 -j$cpu_num cflags=-fPIC cxxflags=-fPIC --with-atomic --with-thread --with-system --with-chrono --with-date_time --with-log --with-regex --with-serialization --with-filesystem --with-locale --with-iostreams threading=multi link=static release install --prefix=${install_lib_dir} architecture=arm &> boostbuild.txt
   else
-    ./b2 -j$cpu_num cflags=-fPIC cxxflags=-fPIC --with-atomic --with-thread --with-system --with-chrono --with-date_time --with-log --with-regex --with-serialization --with-filesystem --with-locale --with-iostreams threading=multi link=static release install --prefix=${install_lib_dir}
+    ./b2 -j$cpu_num cflags=-fPIC cxxflags=-fPIC --with-atomic --with-thread --with-system --with-chrono --with-date_time --with-log --with-regex --with-serialization --with-filesystem --with-locale --with-iostreams threading=multi link=static release install --prefix=${install_lib_dir} architecture=arm
   fi
   if [ $? -ne 0 ]; then
     exit 1
@@ -409,6 +410,7 @@ BuildRocketMQClient() {
   else
       ROCKETMQ_CMAKE_FLAG=$ROCKETMQ_CMAKE_FLAG" -DCMAKE_BUILD_TYPE=Release"
   fi
+  ROCKETMQ_CMAKE_FLAG=$ROCKETMQ_CMAKE_FLAG" -DBUILD_FOR_ARM=ON"
   cmake .. $ROCKETMQ_CMAKE_FLAG
   if [ $verbose -eq 0 ]; then
     echo "build rocketmq without detail log."
